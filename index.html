@@ -110,24 +110,17 @@ a{text-decoration:none;color:inherit}
    1. FIRST VIEW
    ═══════════════════════════════════════ */
 .fv{
-  position:relative;
   max-width:var(--max-w);
   margin:0 auto;
   background:var(--navy);
 }
 .fv__img{
   width:100%;
-  aspect-ratio:9/16;
-  object-fit:contain;
-  object-position:top center;
   display:block;
 }
-.fv__cta-area{
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  padding:0 24px 28px;
+.fv__cta-bar{
+  background:var(--navy);
+  padding:24px 24px 28px;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -265,15 +258,12 @@ a{text-decoration:none;color:inherit}
 }
 .profile__icon{
   width:80px;height:80px;
-  background:var(--navy);
-  color:var(--white);
   border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:1.5rem;
-  font-weight:700;
-  letter-spacing:.05em;
+  overflow:hidden;
+}
+.profile__icon img{
+  width:100%;height:100%;
+  object-fit:cover;
 }
 .profile__name{
   font-size:1.125rem;
@@ -357,7 +347,7 @@ a{text-decoration:none;color:inherit}
 .final-cta .section-title{margin-bottom:16px}
 
 /* ═══════════════════════════════════════
-   固定ボトムCTA
+   固定ボトムCTA（FVスクロール後に表示）
    ═══════════════════════════════════════ */
 .fixed-cta{
   position:fixed;
@@ -372,6 +362,15 @@ a{text-decoration:none;color:inherit}
   display:flex;
   justify-content:center;
   box-shadow:0 -2px 12px rgba(0,0,0,.15);
+  transform:translateY(100%);
+  opacity:0;
+  transition:transform .3s ease,opacity .3s ease;
+  pointer-events:none;
+}
+.fixed-cta.is-visible{
+  transform:translateY(0);
+  opacity:1;
+  pointer-events:auto;
 }
 .fixed-cta .cta-btn{
   font-size:.9375rem;
@@ -411,8 +410,7 @@ a{text-decoration:none;color:inherit}
 
 /* iPhone SE (375×667) 対応 */
 @media(max-width:375px) and (max-height:667px){
-  .fv__cta-area{padding:0 16px 20px}
-  .cta-btn{padding:13px 16px;font-size:.9375rem}
+  .fv__cta-bar{padding:20px 16px 24px}
 }
 </style>
 </head>
@@ -436,7 +434,7 @@ a{text-decoration:none;color:inherit}
     height="1920"
     fetchpriority="high"
   >
-  <div class="fv__cta-area">
+  <div class="fv__cta-bar">
     <a href="https://line.me/R/ti/p/%40965jyspr" class="cta-btn" rel="noopener noreferrer" target="_blank">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .348-.281.63-.63.63h-2.106v1.317h2.106c.349 0 .63.283.63.63 0 .349-.281.631-.63.631h-2.737a.63.63 0 01-.63-.63V7.868c0-.349.281-.631.63-.631h2.737c.349 0 .63.282.63.63 0 .349-.281.631-.63.631h-2.106v1.365h2.106zm-3.96 3.208a.633.633 0 01-.553.33.616.616 0 01-.303-.082.627.627 0 01-.247-.868l1.848-3.104H14.26a.63.63 0 110-1.261h2.473a.63.63 0 01.538.949l-1.866 3.036zm-4.132.33a.63.63 0 01-.63-.63V7.868a.63.63 0 111.261 0v4.903a.63.63 0 01-.631.63zm-2.89 0a.63.63 0 01-.512-.263L5.316 9.82v2.982a.63.63 0 11-1.261 0V7.868a.63.63 0 011.143-.363l2.555 3.32V7.868a.63.63 0 111.261 0v4.903a.63.63 0 01-.63.63zM12 2.654C6.475 2.654 2 6.218 2 10.604c0 3.292 2.583 6.128 6.253 7.084.242.053.573.163.657.374.075.19.049.488.024.681l-.106.636c-.032.19-.15.741.649.404.798-.337 4.306-2.536 5.876-4.342C17.068 13.541 22 12.077 22 10.604 22 6.218 17.525 2.654 12 2.654"/></svg>
       LINEで無料電子書籍を受け取る
@@ -511,7 +509,7 @@ a{text-decoration:none;color:inherit}
 <section class="section--navy" aria-label="自己紹介">
   <div class="section__inner" style="padding:var(--section-py) var(--section-px);">
     <div class="profile">
-      <div class="profile__icon">K</div>
+      <div class="profile__icon"><img src="profile.jpg" alt="Kuni（大前邦継）" width="80" height="80"></div>
       <div class="profile__name">
         Kuni（大前邦継）
         <small>高知県土佐清水市</small>
@@ -612,5 +610,18 @@ a{text-decoration:none;color:inherit}
   </a>
 </div>
 
+<script>
+// 固定CTAをFVスクロール後にだけ表示
+(function(){
+  var fv=document.querySelector('.fv');
+  var bar=document.querySelector('.fixed-cta');
+  if(!fv||!bar)return;
+  var io=new IntersectionObserver(function(entries){
+    // FVが画面外に出たら固定CTAを表示
+    bar.classList.toggle('is-visible',!entries[0].isIntersecting);
+  },{threshold:0});
+  io.observe(fv);
+})();
+</script>
 </body>
 </html>
